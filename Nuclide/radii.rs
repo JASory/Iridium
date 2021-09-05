@@ -7,12 +7,12 @@ use crate::nuclide::Nuclide;
 impl Nuclide{
 
     ///Returns the approximate covalent radii of the nuclei in a single, double, or triple bond. Values other than 1,2, && 3 will return an error.  
-   pub  fn covalent_radii(&self, bond: usize)->Result<f64, String>{
+   pub  fn covalent_radii(&self, bond: usize)->Result<f64, &'static str>{
           if bond > 0 && bond < 4{
              return Ok(COVALENT_RADII[(self.atomic_num()-1)*3 + bond-1])
           }
           else{
-            return Err("Not a tested bond type".to_string())
+            return Err("Not a tested bond type")
           }
  
        }
