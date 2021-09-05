@@ -1,5 +1,5 @@
 use crate::elemental::ELECTRON_AFFINITY;
-use crate::elemental::IONIZATION_ENERGIES;
+use crate::ionization::IONIZATION_ENERGIES;
 use crate::elemental::THERMOCHEMICAL_ELECTRO_NEGATIVE;
 use crate::elemental::ALLEN_ELECTRO;
 use crate::elemental::PAULING_ELECTRO;
@@ -14,20 +14,25 @@ impl Nuclide{
   pub  fn electron_affinity_ev(&self)->f64{
           self.electron_affinity()*0.010364265
        }      
- ///Returns the ionization energies for the first 3 levels. Values are in kj/mol
-  pub  fn ionization_energies(&self, level: usize)->Result<f64, String>{
-          if level > 0 && level < 4{
-             return Ok(IONIZATION_ENERGIES[(self.atomic_num()-1)*3 + level-1])
+ ///Returns the ionization energies for all known levels. Values are in kj/mol
+  pub  fn ionization_energies(&self, level: usize)->Result<f64, &'static str>{
+          
+          if self.atomic_num() > 110{
+             return Ok(f64::NAN)
+          }
+          
+          else if level > 0 && level < self.atomic_num()+1{
+             return Ok(IONIZATION_ENERGIES[ (((self.atomic_num()*(self.atomic_num()+1))>>1) -self.atomic_num()) + level-1])
           }
           else{
-             return Err("Not a supported value".to_string())
+             return Err("Not a supported value")
           }
        }
        
-  pub fn ionization_energies_ev(&self, level: usize)->Result<f64, String>{
+  pub fn ionization_energies_ev(&self, level: usize)->Result<f64, &'static str>{
          match self.ionization_energies(level){
                Ok(x)=> return Ok(x*0.010364265f64),
-               Err(_)=> return Err("Not a supported value".to_string()),
+               Err(_)=> return Err("Not a supported value"),
          }
       }     
  /// Returns the thermochemical electronegativity as calculated by Oganov and Tantardini. Currently the best predictor of experimental values
