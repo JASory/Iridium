@@ -1,25 +1,15 @@
 //mod index;
 use crate::index::SYMBOL;
 use crate::index::SYMBOL_INDEX;
+use crate::index::NAME;
 use crate::atomic_mass::ATOMIC_MASS;
 
 /// Takes the proton_neutron count and returns the nuclide index, useful to pair with change and assign
 pub fn nucleons_nuclide(x: &(usize, usize))-> usize{
     SYMBOL_INDEX[x.0-1].0 -(SYMBOL_INDEX[x.0 -1].1-x.0) + x.1 
  }
-///Calls RDRAND to produce random numbers for decay
- pub fn rand()->u64{
-   let mut x: u64 = 0;
-  let k = unsafe{core::arch::x86_64::_rdrand64_step(&mut x)};
-x
-}
-/*
-pub fn rand()->u64{
 
-
-}
-*/
-
+#[derive(Debug)]
  pub struct Nuclide{
      nuclide: usize,
 }
@@ -43,7 +33,7 @@ If you input an abbreviation that isn't supported or an isotope that isn't suppo
 
 
 
-  pub fn new(x: &str, isotope: usize)-> Result<Nuclide,String >{
+  pub fn new(x: &str, isotope: usize)-> Result<Nuclide,&'static str >{
  
          match SYMBOL.iter().position(|y| y ==&x){
           Some(x)=> if isotope >= SYMBOL_INDEX[x].1 &&  isotope <= SYMBOL_INDEX[x].2 {
@@ -52,9 +42,9 @@ If you input an abbreviation that isn't supported or an isotope that isn't suppo
                      )
                    }
                    else{
-                   return Err("Not a known isotope".to_string())
+                   return Err("Not a known isotope")
                    }
-         None=> return Err("Not a known element".to_string())
+         None=> return Err("Not a known element")
        }
        
        }
@@ -128,6 +118,10 @@ pub  fn isotope(&self)->(usize, usize){
           let iso = self.isotope();
           SYMBOL[iso.0-1].to_owned() + "-"+ &iso.1.to_string()
        }
+   ///Returns the element name.     
+  pub fn element_name(&self)->String{
+         NAME[self.atomic_num()-1].to_string()
+       }     
  ///Returns the proton and neutron count 
   pub  fn proton_neutron(&self)->(usize, usize){
           (self.isotope().0,  self.isotope().1 - self.isotope().0)
@@ -150,11 +144,37 @@ pub  fn isotope(&self)->(usize, usize){
   pub  fn mass_deficit_kg(&self)->f64{
        self.mass_deficit()* 1.6605390666E-27
        }
+    /// Mass deficit as MeV   
+  pub fn mass_deficit_ev(&self)->f64{
+       self.mass_deficit()*931.36808885
+       }
        
-  //Result as electron volts, implement Myers Swiatecki semi-empirical equation
-  ///Returns the binding energy. Utilizes basic mass deficit conversion to approximate.  
+  pub fn mass_deficit_j(&self)->f64{
+      self.mass_deficit_ev()*1.602177E-19
+      }     
+       
+       /*Lighter evaluation   A < 50
+       14.9297A - 15.058A^(2/3) - 0.6615*(z^2)/A^(1/3) - 21.6091*((a-z^2)^2) 
+       +- 10.1744*(1/sqrt(A))
+      */
+  ///Returns the binding energy. Utilizes modified Bethe-Weisacker with coefficients computed by Benzaid, et al
   pub  fn binding_energy(&self)->f64{
-          self.mass_deficit()*931.49410242
+   let (z,a) = (self.proton_neutron().0,self.proton_neutron().0 + self.proton_neutron().1);
+   let (zf64, af64)= (z as f64, a as f64);
+   let even_odd_approx  = 14.6433*af64 - 14.0788*af64.powf(2.0/3.0) 
+                          -0.66442*(zf64.powi(2)/af64.powf(1.0/3.0))  - 21.07*((a - 2*z).pow(2) as f64)/af64; 
+   let correction = 11.5398*(af64.sqrt().recip());
+   
+   if  z%2 == 0 && a%2 == 0{
+       return even_odd_approx + correction
+    }                       
+    if z%2 == 1 && a%2 == 1{
+       return even_odd_approx - correction
+   }
+   else{
+       return even_odd_approx 
+   }     
+   
        }
      
  pub fn binding_energy_j(&self)->f64{
