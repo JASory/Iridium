@@ -7,6 +7,7 @@ use crate::half_life::HALF_LIFE          ;
  use crate::nuclide::Nuclide             ;
  use crate::particle::Particle           ;
 
+
  use crate::particle::PROTONMASS         ; 
  use crate::particle::NEUTRONMASS        ; 
  use crate::particle::ELECTRONMASS       ; 
@@ -14,8 +15,13 @@ use crate::half_life::HALF_LIFE          ;
  use crate::particle::DEUTERONMASS       ; 
  use crate::particle::TRITONMASS         ; 
  use crate::particle::NEUTRINOMASS       ;   
+ 
+use Pion::lepton::Lepton;
+use Pion::lepton::AntiLepton;
+use Pion::baryon::Baryon;
+use Pion::baryon::AntiBaryon;
 
-pub fn rand()->u64{
+ fn rand()->u64{
    let mut x: u64 = 0;
   let k = unsafe{core::arch::x86_64::_rdrand64_step(&mut x)};
 x
@@ -188,7 +194,7 @@ match x {
             let particleenergia = totalenergia -(PROTONMASS/self.amu())* totalenergia ; 
              energia = totalenergia-particleenergia;
              self.change(daughter.nuclide_index());
-             particle_vector.push(Particle::Proton(particleenergia));
+             particle_vector.push(Particle::Baryon( Baryon::Proton(particleenergia) ) );
           } ,
     3  => {                    // 2p
             izotop.0-=2;
@@ -197,8 +203,8 @@ match x {
             let particleenergia = totalenergia -(2.0*PROTONMASS/self.amu())* totalenergia ;   
              energia = totalenergia-particleenergia;
              self.change(daughter.nuclide_index());
-             particle_vector.push(Particle::Proton(particleenergia/2.0));
-             particle_vector.push(Particle::Proton(particleenergia/2.0));
+             particle_vector.push(Particle::Baryon( Baryon::Proton(particleenergia/2.0) ));
+             particle_vector.push(Particle::Baryon( Baryon::Proton(particleenergia/2.0) ));
           } ,
     4  => {          // n 
                   izotop.1-=1;
@@ -207,7 +213,7 @@ match x {
             let particleenergia = totalenergia -(NEUTRONMASS/self.amu())* totalenergia ; 
             energia = totalenergia-particleenergia;
              self.change(daughter.nuclide_index());
-             particle_vector.push(Particle::Neutron(particleenergia));            
+             particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia) ));            
           } ,
     5  => {          // 2n 
                   izotop.1-=2;
@@ -216,8 +222,8 @@ match x {
             let particleenergia = totalenergia -(2.0*NEUTRONMASS/self.amu())* totalenergia ;
              energia = totalenergia-particleenergia;
              self.change(daughter.nuclide_index());
-             particle_vector.push(Particle::Neutron(particleenergia/2.0));
-             particle_vector.push(Particle::Neutron(particleenergia/2.0));       
+             particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/2.0) ));
+             particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/2.0) ));       
           }      
     6  => {        println!("6");            // Electron capture
                   izotop.0-=1; izotop.1+=1;
@@ -226,7 +232,7 @@ match x {
             let particleenergia = totalenergia -(NEUTRINOMASS/self.amu())* totalenergia ;
             energia = totalenergia-particleenergia;
             self.change(daughter.nuclide_index());
-            particle_vector.push(Particle::Neutrino(particleenergia));
+            particle_vector.push(Particle::Lepton( Lepton::ElectronNeutrino(particleenergia) ));
           } ,
     7  => {            // Double Electron Capture
                   izotop.0-=2; izotop.1+=2;
@@ -235,19 +241,19 @@ match x {
             let particleenergia = totalenergia -(2.0*NEUTRINOMASS/self.amu())* totalenergia ;
             energia = totalenergia-particleenergia;
             self.change(daughter.nuclide_index());
-            particle_vector.push(Particle::Neutrino(particleenergia/2.0));
-            particle_vector.push(Particle::Neutrino(particleenergia/2.0));
+            particle_vector.push(Particle::Lepton( Lepton::ElectronNeutrino(particleenergia/2.0) ));
+            particle_vector.push(Particle::Lepton( Lepton::ElectronNeutrino(particleenergia/2.0) ));
           } , 
-    8  => {                    // B-p
+    8  => {                    // B-p  particleenergia*2.35E-7*ELECTRONMASS
             izotop.1-=1; 
             let daughter= Nuclide::assign(nucleons_nuclide(&izotop) );
             let totalenergia = (self.amu()- daughter.amu())*931.49410242;
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+PROTONMASS)/self.amu())* totalenergia ;   
             let protonenergia  = particleenergia - particleenergia*2.35E-7;
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Proton(protonenergia));
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));  
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia) ) );
+            particle_vector.push(Particle::Lepton( Lepton::Electron(particleenergia*(1.0-2.35E-7) ) ));  
+            particle_vector.push(Particle::AntiLepton( AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));  
           } ,      
     9  => {          // Beta +  http://hyperphysics.phy-astr.gsu.edu/hbase/Nuclear/beta2.html#c1
                   izotop.0-=1; izotop.1+=1;
@@ -255,8 +261,8 @@ match x {
             let totalenergia = (self.amu()- daughter.amu())*931.49410242;
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS)/self.amu())* totalenergia ;  
             energia = totalenergia - particleenergia ; 
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7));              
+            particle_vector.push(Particle::AntiLepton( AntiLepton::Electron(particleenergia*(1.0-2.35E-7) ) ));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7)));              
           } ,
    10  => {            // Double Beta + 
                   izotop.0-=2; izotop.1+=2;
@@ -264,10 +270,10 @@ match x {
             let totalenergia = (self.amu()- daughter.amu())*931.49410242;
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS)*2.0/self.amu())* totalenergia ;  
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)*0.5));  
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)*0.5));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*0.5));
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*0.5));    
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7)*0.5) ) );  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7)*0.5) ) );  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*(1.0-2.35E-7)*0.5) ) );  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*(1.0-2.35E-7)*0.5) ) );  
           } ,
    11  => {           // Beta -
                   izotop.0+=1; izotop.1-=1;
@@ -275,8 +281,8 @@ match x {
             let totalenergia = (self.amu() -daughter.amu())*931.49410242;;
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS)/self.amu())* totalenergia ; 
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7));
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7)));
             self.change(daughter.nuclide_index());
           } ,
    12  => {          // Double Beta -
@@ -286,10 +292,10 @@ match x {
             let totalenergia = (self.amu()- daughter.amu())*931.49410242;
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS)*2.0/self.amu())* totalenergia ;  
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)*0.5));  
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)*0.5));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*0.5));
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*0.5));      
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7)*0.5)));  
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7)*0.5)));  
+            particle_vector.push(Particle::AntiLepton( AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));
+            particle_vector.push(Particle::AntiLepton( AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));      
           } ,
    13  => {                    // B- + n 
                   izotop.0+=1; izotop.1-=2; 
@@ -298,9 +304,9 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+NEUTRONMASS)/self.amu())* totalenergia ;   
             let neutronenergia  = particleenergia - particleenergia*2.35E-7;
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Neutron(neutronenergia));
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));      
+            particle_vector.push(Particle::Baryon(Baryon::Neutron(neutronenergia)));
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));      
           } ,
    14  => {                    // B- + 2n
                   izotop.0+=1; izotop.1-=3; 
@@ -310,10 +316,10 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+2.0*NEUTRONMASS)/self.amu())* totalenergia ;   
             let neutronenergia  = particleenergia - particleenergia*2.35E-7;   
             energia = totalenergia - particleenergia ;       
-            particle_vector.push(Particle::Neutron(neutronenergia/2.0));
-            particle_vector.push(Particle::Neutron(neutronenergia/2.0));            
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));       
+            particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/2.0) ));
+            particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/2.0) ));           
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    15  => {                    // B- + 3n
             izotop.0+=1; izotop.1-=4; 
@@ -322,11 +328,11 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+3.0*NEUTRONMASS)/self.amu())* totalenergia ;   
             let neutronenergia  = particleenergia - particleenergia*2.35E-7;
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Neutron(neutronenergia/3.0));
-            particle_vector.push(Particle::Neutron(neutronenergia/3.0));      
-            particle_vector.push(Particle::Neutron(neutronenergia/3.0));            
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));       
+            particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/3.0) ));
+            particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/3.0) ));   
+            particle_vector.push(Particle::Baryon( Baryon::Neutron(particleenergia/3.0) ));
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    16  => {                    // B+ + p
             izotop.0-=2; izotop.1+=1;
@@ -335,9 +341,9 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+PROTONMASS)/self.amu())* totalenergia  ;
             let protonenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Proton(protonenergia));    
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*ELECTRONMASS));   
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia) ) );
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    17  => {                    // B+ + 2p
             izotop.0-=3; izotop.1+=1;
@@ -346,10 +352,10 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+2.0*PROTONMASS)/self.amu())* totalenergia  ;
             let protonenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Proton(protonenergia/2.0));  
-            particle_vector.push(Particle::Proton(protonenergia/2.0));      
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*ELECTRONMASS));      
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia/2.0) ) );
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia/2.0) ) );
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    18  => {                    // B+ + 3p
             izotop.0-=4; izotop.1+=1;
@@ -358,11 +364,11 @@ match x {
             let particleenergia = totalenergia -((ELECTRONMASS+NEUTRINOMASS+3.0*PROTONMASS)/self.amu())* totalenergia;  
             let protonenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
-            particle_vector.push(Particle::Proton(protonenergia/3.0));  
-            particle_vector.push(Particle::Proton(protonenergia/3.0));      
-            particle_vector.push(Particle::Proton(protonenergia/3.0));      
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*ELECTRONMASS));       
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia/3.0) ) );
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia/3.0) ) );
+            particle_vector.push(Particle::Baryon( Baryon::Proton(protonenergia/3.0) ) );
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
                                   
           } ,
    19  => {                    // B- + A 
@@ -373,8 +379,8 @@ match x {
             let alphaenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
             particle_vector.push(Particle::Alpha(alphaenergia));    
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS))
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    20  => {                    // B+ + A
                   izotop.0-=3; izotop.1-=1;
@@ -384,8 +390,8 @@ match x {
             let alphaenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
             particle_vector.push(Particle::Alpha(alphaenergia));    
-            particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*ELECTRONMASS));      
+            particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    21  => {                    // B- + Deuteron 
                   izotop.1-=3; 
@@ -395,8 +401,8 @@ match x {
             let deuteronenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
             particle_vector.push(Particle::Deuteron(deuteronenergia));    
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));            
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    22  => {                    // B- + Triton
                   izotop.1-=4;     
@@ -406,8 +412,8 @@ match x {
             let tritonenergia  = particleenergia - particleenergia*2.35E-7; 
             energia = totalenergia - particleenergia ;
             particle_vector.push(Particle::Triton(tritonenergia));    
-            particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));       
+            particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+            particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    23  => {                    // SF
              let rand = rand()>>54;
@@ -431,9 +437,9 @@ match x {
              let totalenergia = (self.amu()- daughter.amu())*931.49410242;
              let particleenergia = (daughter.amu()/self.amu())* totalenergia ;  
              energia = totalenergia - particleenergia ;
-              particle_vector.push(Particle::Element(decay_particle,particleenergia));
-              particle_vector.push(Particle::Electron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::AntiNeutrino(particleenergia*2.35E-7*ELECTRONMASS));  
+             particle_vector.push(Particle::Element(decay_particle,particleenergia));
+             particle_vector.push(Particle::Lepton(Lepton::Electron(particleenergia*(1.0-2.35E-7))));  
+             particle_vector.push(Particle::AntiLepton(AntiLepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));  
           } ,
    25  => {                    // B+  +  SF
              let rand = rand()>>54;
@@ -444,9 +450,9 @@ match x {
              let totalenergia = (self.amu()- daughter.amu())*931.49410242;
              let particleenergia = (daughter.amu()/self.amu())* totalenergia ;  
              energia = totalenergia - particleenergia ;
-              particle_vector.push(Particle::Element(decay_particle,particleenergia));
-              particle_vector.push(Particle::Positron(particleenergia*(1.0-2.35E-7)));  
-            particle_vector.push(Particle::Neutrino(particleenergia*2.35E-7*ELECTRONMASS));  
+             particle_vector.push(Particle::Element(decay_particle,particleenergia));
+             particle_vector.push(Particle::AntiLepton(AntiLepton::Electron(particleenergia*(1.0-2.35E-7))));  
+             particle_vector.push(Particle::Lepton(Lepton::ElectronNeutrino(particleenergia*2.35E-7*ELECTRONMASS)));       
           } ,
    26  => {                    // CD C14 
                    izotop.0-=6; izotop.1-=8;                        
@@ -516,7 +522,7 @@ match x {
  (energia,particle_vector)
 }
 /** 
-     Performs decay over the given time
+     Returns the name and isotope number of the nuclide
      
         ```
         let uranium = Nuclide::new("U", 238).unwrap();
@@ -540,14 +546,7 @@ match x {
   }
   (total_energy, particlevec)
  }
- /*
- theorectical nuclide using the liquid drop model
-                                   &str amu, binding energy,  likely decay mode
- fn create(proton: usize, neutron: usize)->(f64,f64){
-    
- }
  
-*/
 }
 
 
