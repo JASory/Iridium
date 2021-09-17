@@ -1,13 +1,42 @@
-//mod index;
 use crate::index::SYMBOL;
 use crate::index::SYMBOL_INDEX;
 use crate::index::NAME;
 use crate::atomic_mass::ATOMIC_MASS;
+use crate::particle::PROTONMASS;
+use crate::particle::NEUTRONMASS;
 
 /// Takes the proton_neutron count and returns the nuclide index, useful to pair with change and assign
 pub fn nucleons_nuclide(x: &(usize, usize))-> usize{
     SYMBOL_INDEX[x.0-1].0 -(SYMBOL_INDEX[x.0 -1].1-x.0) + x.1 
  }
+ 
+ 
+ /** Returns binding energy as computed by Bethe-Weizsacker formula using Benzaid et. al's parameters. This model is used for 
+     computing the binding_energy, and  proton/neutron separation energies
+ */
+ 
+pub fn mass_model(a: usize, z: usize)->f64{
+
+   let (af64, zf64) = (a as f64, z as f64);
+
+   let even_odd_approx  = 14.6433*af64 - 14.0788*af64.powf(2.0/3.0) 
+                         -0.66442*(zf64.powi(2)/af64.powf(1.0/3.0))  
+                         - 21.068*((af64 - 2.0*zf64).powi(2))/af64; 
+                      
+   let correction = 11.5398*(af64.sqrt().recip());
+   
+   if  z%2 == 0 && a%2 == 0{
+       return even_odd_approx + correction
+    }                       
+    if z%2 == 1 && a%2 == 1{
+       return even_odd_approx - correction
+   }
+   else{
+       return even_odd_approx 
+   }     
+} 
+
+
 
 #[derive(Debug)]
  pub struct Nuclide{
@@ -28,7 +57,7 @@ use Nuclide::nuclide::Nuclide;
 
  let strontium = Nuclide::new("Sr", 90).unwrap();
  ```
-If you input an abbreviation that isn't supported or an isotope that isn't supported you will receive an error saying so. There are currently 3299 nuclides supported, which will cover most needs.
+If you input an abbreviation that isn't supported or an isotope that isn't supported you will receive an error saying so. There are currently 3585 nuclides supported, which will cover most needs.
 */
 
 
@@ -79,6 +108,19 @@ If you input an abbreviation that isn't supported or an isotope that isn't suppo
   pub  fn change(&mut self, x: usize){
           self.nuclide = x
      }
+     /** Takes proton and neutron argument, returns a tuple of approximate mass and binding energy. Allows for approximation of theorectical nuclides, using the mass model
+     
+        ```
+        let sr90 = Nuclide::create(38,52);
+                              // real computed value is 89.907 amu,782 MeV
+        assert_eq!(sr90, (89.893471169, 776.39792))
+        ```
+     */
+  pub  fn create(z: usize, n: usize)-> (f64,f64){
+      let b_e =  mass_model(z+n,z);
+     ( (z as f64*PROTONMASS + n as f64*NEUTRONMASS) - (b_e/931.36808885),b_e)
+  }    
+     
  ///Returns the nuclide index used in the struct. Useful to use in conjunction with the assign or change functions. 
   pub  fn nuclide_index(&self)->usize{
           self.nuclide.clone()
@@ -157,29 +199,27 @@ pub  fn isotope(&self)->(usize, usize){
        14.9297A - 15.058A^(2/3) - 0.6615*(z^2)/A^(1/3) - 21.6091*((a-z^2)^2) 
        +- 10.1744*(1/sqrt(A))
       */
-  ///Returns the binding energy. Utilizes modified Bethe-Weisacker with coefficients computed by Benzaid, et al
+  ///Returns the binding energy. Utilizing the mass model
   pub  fn binding_energy(&self)->f64{
    let (z,a) = (self.proton_neutron().0,self.proton_neutron().0 + self.proton_neutron().1);
-   let (zf64, af64)= (z as f64, a as f64);
-   let even_odd_approx  = 14.6433*af64 - 14.0788*af64.powf(2.0/3.0) 
-                          -0.66442*(zf64.powi(2)/af64.powf(1.0/3.0))  - 21.07*((a - 2*z).pow(2) as f64)/af64; 
-   let correction = 11.5398*(af64.sqrt().recip());
-   
-   if  z%2 == 0 && a%2 == 0{
-       return even_odd_approx + correction
-    }                       
-    if z%2 == 1 && a%2 == 1{
-       return even_odd_approx - correction
-   }
-   else{
-       return even_odd_approx 
-   }     
+       mass_model(a,z )
    
        }
      
  pub fn binding_energy_j(&self)->f64{
       self.binding_energy()*1.602176634E-19
      }      
-       
+       /// Approximate neutron separation energy
+  pub fn neutron_separation(&self)->f64{
+  let (z,n) = self.proton_neutron();
+      mass_model(z+n,z)-mass_model(z+n-1,z)
+  }     
+     /// Approximate proton separation energy
+  pub fn proton_separation(&self)->f64{
+  let (z,n) = self.proton_neutron();
+      mass_model(z+n,z)-mass_model(z+n-1,z-1)
+  }
       
 }
+       
+       
