@@ -2,6 +2,7 @@
 use crate::elemental::VAN_DER_WAAL_CRYSTAL;
 use crate::elemental::VAN_DER_WAAL_ISOLATED;
 use crate::elemental::COVALENT_RADII;
+use crate::elemental::IONIC_RADII;
 use crate::nuclide::Nuclide;
 
 impl Nuclide{
@@ -16,6 +17,10 @@ impl Nuclide{
           }
  
        }
+   /// ionic radii     
+  pub fn ionic_radii(&self)->f64{
+              IONIC_RADII[self.atomic_num()-1]
+  }     
 
      ///Returns the Van Der Waal radius in crystalline structures. Values are in meters. 
   pub  fn vdr_crystal(&self)->f64{
