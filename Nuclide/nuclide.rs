@@ -2,8 +2,11 @@ use crate::index::SYMBOL;
 use crate::index::SYMBOL_INDEX;
 use crate::index::NAME;
 use crate::atomic_mass::ATOMIC_MASS;
+use crate::spinparity::SPIN_PARITY;
+
 use crate::particle::PROTONMASS;
 use crate::particle::NEUTRONMASS;
+
 
 /// Takes the proton_neutron count and returns the nuclide index, useful to pair with change and assign
 pub fn nucleons_nuclide(x: &(usize, usize))-> usize{
@@ -208,7 +211,13 @@ pub  fn isotope(&self)->(usize, usize){
      
  pub fn binding_energy_j(&self)->f64{
       self.binding_energy()*1.602176634E-19
-     }      
+     }    
+    
+         ///Returns the isospin and parity in the form of a i8 pair, one of which is negatively signed for - parity
+ pub fn spin_parity(&self)->(i8,i8){
+         SPIN_PARITY[self.nuclide]
+ }        
+    
        /// Approximate neutron separation energy
   pub fn neutron_separation(&self)->f64{
   let (z,n) = self.proton_neutron();
