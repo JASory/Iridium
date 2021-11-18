@@ -11,5 +11,6 @@
                 mod atomic_mass;
                 mod elemental  ;
                 mod ionization ;
+                mod spinparity ;
                 mod particle   ;
                 use nuclide::Nuclide;
