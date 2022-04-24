@@ -14,7 +14,7 @@
        "Rhodium"      , "Palladium"    , "Silver"       , "Cadmium"       , 
        "Indium"       , "Tin"          , "Antimony"     , "Tellurium"     ,
        "Iodine"       , "Xenon"        , "Caesium"      , "Barium"        , 
-       "Lathanum"     , "Cerium"       , "Praseodymium" , "Neodymium"     , 
+       "Lanthanum"    , "Cerium"       , "Praseodymium" , "Neodymium"     , 
        "Promethium"   , "Samarium"     , "Europium"     , "Gadolinium"    , 
        "Terbium"      , "Dysprosium"   , "Holmium"      , "Erbium"        , 
        "Thulium"      , "Ytterbium"    , "Lutetium"     , "Hafnium"       ,
