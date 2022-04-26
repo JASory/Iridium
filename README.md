@@ -28,6 +28,27 @@ In addition to providing the previous information this library has some other fe
 - Prediction of mass and binding energies of theorectical nuclides using Bethe-Weiszacker Liquid Drop model
 See the periodic table repository for a simple look-up gui implementation. 
 
+#### Usage 
+   ```rust
+
+ use Nuclide::Nuclide;
+ 
+   // Create mutable U-235 nuclide, mutable to permit decay. 
+   
+  let mut u235 = Nuclide::new(U-235).unwrap();
+  
+   // Approximation ionization energy of U-235 +52 in kilojoules per mole 
+   
+   //(SI units are produced by default, however non-SI units are also frequently supported, read the documentation)
+   
+   assert_eq!(u235.ionization_energies(52).unwrap(),283474.03313085996);
+   
+   // Model the decay over 5x10^20 seconds, total energy and particles are released 
+   
+   let (decay_energy, decay_particles) = u235.decay(5E+20);
+   
+   assert_eq!(u235.identity(), "Pb-206")
+ ```
 
 #### References
 [1] Tantardini, C., Oganov, A.R. ”Thermochemical Electronegatives of the elements”. Nature Commu-
