@@ -35,7 +35,7 @@ See the periodic table repository for a simple look-up gui implementation.
  
    // Create mutable U-235 nuclide, mutable to permit decay. 
    
-  let mut u235 = Nuclide::new(U-235).unwrap();
+  let mut u235 = Nuclide::new("U-235").unwrap();
   
    // Approximation ionization energy of U-235 +52 in kilojoules per mole 
    
