@@ -1,0 +1,16 @@
+[package]
+name = "Nuclide"
+version = "0.1.9"
+edition = "2021"
+authors = ["J.A Sory jasory@rust-cas.org"]
+description = "An up-to-date database of nuclide and isotope properties "
+keywords = ["atom","nuclide","isotope","elements","nuclear-physics"]
+homepage = "https://rust-cas.org/physics/datasheets/nuclide.html"
+repository = "https://github.com/JASory/Iridium"
+license = "GPL-3.0-or-later"
+categories = ["science"]
+readme = "README.md"
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+Pion = "0.0.1"
