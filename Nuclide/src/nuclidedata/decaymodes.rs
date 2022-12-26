@@ -38,12 +38,6 @@ use Pion::lepton::Lepton;
 const DALTON_MeV: f64 = 931.49410242;
 //const NEUTRINO_RATIO: f64 = 0.999999765;
 
-fn rand() -> u64 {
-    let mut x: u64 = 0;
-    unsafe { core::arch::x86_64::_rdrand64_step(&mut x) };
-    x
-}
-
 fn max(x: Nuclide, y: Nuclide) -> (Nuclide, Nuclide) {
     if x.am() > y.am() {
         return (x, y);
@@ -461,7 +455,7 @@ impl Nuclide {
     #[inline]
     pub fn spontaneous_fission(&mut self) -> (f64, Vec<Particle>) {
         let mut izotop = self.proton_neutron();
-        let rn = rand() as usize;
+        let rn = fastrand::usize(..);
 
         let mut z = rn % izotop.0;
 

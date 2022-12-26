@@ -19,12 +19,6 @@ use crate::nuclidedata::spinparity::SPIN_PARITY;
 use crate::nuclidedata::decay_chain::DECAY_CHAIN;
 use crate::nuclidedata::half_life::HALF_LIFE;
 
-fn rand() -> u64 {
-    let mut x: u64 = 0;
-    unsafe { core::arch::x86_64::_rdrand64_step(&mut x) };
-    x
-}
-
 pub fn mass_model(a: usize, z: usize) -> f64 {
     let (af64, zf64) = (a as f64, z as f64);
 
@@ -368,7 +362,7 @@ impl Atom for Nuclide {
         let prob =
             ((1.0 - (-self.decay_constant() * time).exp()) * 1.844_674_407_370_955E19) as u64;
 
-        prob > rand()
+        prob > fastrand::u64(..)
     }
 
     /// Returns the probable decay modes  as a string
@@ -478,7 +472,7 @@ impl Atom for Nuclide {
             let trei = DECAY_CHAIN[idx + 2] + doua;
             let patru = DECAY_CHAIN[idx + 3] + trei;
             let cinci = DECAY_CHAIN[idx + 4] + patru;
-            let alea = rand();
+            let alea = fastrand::u64(..);
             let decay_vector = DECAY_CHAIN[self.nuclide_index() * 6 + 5].to_be_bytes();
 
             if alea > 0 && alea < unu {
