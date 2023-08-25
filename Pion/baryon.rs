@@ -29,16 +29,16 @@ pub enum AntiBaryon{
        
   pub const fn charge(&self)->f64{
          match self{
-          Baryon::Proton(x)  => 1f64,
-          Baryon::Neutron(x) => 0f64,
+          Baryon::Proton(_)  => 1f64,
+          Baryon::Neutron(_) => 0f64,
           } 
   }      
        // MeV
   pub  const fn rest_mass(&self)->f64{
        
         match self{
-          Baryon::Proton(x)  => 938.27231,
-          Baryon::Neutron(x) => 939.5656,
+          Baryon::Proton(_)  => 938.27231,
+          Baryon::Neutron(_) => 939.5656,
           } 
        }
        
@@ -74,16 +74,16 @@ pub enum AntiBaryon{
        
   pub const fn charge(&self)->f64{
          match self{
-          AntiBaryon::Proton(x)  => 1f64,
-          AntiBaryon::Neutron(x) => 0f64,
+          AntiBaryon::Proton(_)  => 1f64,
+          AntiBaryon::Neutron(_) => 0f64,
           } 
   }      
        /// MeV
   pub const fn rest_mass(&self)->f64{
        
         match self{
-          AntiBaryon::Proton(x)  => 938.27231,
-          AntiBaryon::Neutron(x) => 939.5656,
+          AntiBaryon::Proton(_)  => 938.27231,
+          AntiBaryon::Neutron(_) => 939.5656,
           } 
        }
        

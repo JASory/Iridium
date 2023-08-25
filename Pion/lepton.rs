@@ -23,12 +23,12 @@ pub enum AntiLepton{
    pub const fn rest_mass(&self)->f64{
    
     match self {
-        Lepton::Electron(x) => 0.510998950,
-        Lepton::Muon(x)     => 105.6583755,
-        Lepton::Tau(x)      => 1776.86,
-        Lepton::ElectronNeutrino(x) => 0f64,
-        Lepton::MuNeutrino(x)       => 0f64,
-        Lepton::TauNeutrino(x)      => 0f64,
+        Lepton::Electron(_) => 0.510998950,
+        Lepton::Muon(_)     => 105.6583755,
+        Lepton::Tau(_)      => 1776.86,
+        Lepton::ElectronNeutrino(_) => 0f64,
+        Lepton::MuNeutrino(_)       => 0f64,
+        Lepton::TauNeutrino(_)      => 0f64,
         }
     }
     
@@ -57,12 +57,12 @@ pub enum AntiLepton{
     
  pub const fn charge(&self)->f64{
         match self {
-        Lepton::Electron(x) => -1f64,
-        Lepton::Muon(x)     => -1f64,
-        Lepton::Tau(x)      => -1f64,
-        Lepton::ElectronNeutrino(x) => 0f64,
-        Lepton::MuNeutrino(x)       => 0f64,
-        Lepton::TauNeutrino(x)      => 0f64,
+        Lepton::Electron(_) => -1f64,
+        Lepton::Muon(_)     => -1f64,
+        Lepton::Tau(_)      => -1f64,
+        Lepton::ElectronNeutrino(_) => 0f64,
+        Lepton::MuNeutrino(_)       => 0f64,
+        Lepton::TauNeutrino(_)      => 0f64,
         }
  }   
  }
@@ -73,12 +73,12 @@ pub enum AntiLepton{
    pub const fn rest_mass(&self)->f64{
    
     match self {
-        AntiLepton::Electron(x) => 0.510998950,
-        AntiLepton::Muon(x)     => 105.6583755,
-        AntiLepton::Tau(x)      => 1776.86,
-        AntiLepton::ElectronNeutrino(x) => 0f64,
-        AntiLepton::MuNeutrino(x)       => 0f64,
-        AntiLepton::TauNeutrino(x)      => 0f64,
+        AntiLepton::Electron(_) => 0.510998950,
+        AntiLepton::Muon(_)     => 105.6583755,
+        AntiLepton::Tau(_)      => 1776.86,
+        AntiLepton::ElectronNeutrino(_) => 0f64,
+        AntiLepton::MuNeutrino(_)       => 0f64,
+        AntiLepton::TauNeutrino(_)      => 0f64,
         }
     }
     
@@ -101,12 +101,12 @@ pub enum AntiLepton{
  
  pub const fn charge(&self)->f64{
         match self {
-        AntiLepton::Electron(x) => 1f64,
-        AntiLepton::Muon(x)     => 1f64,
-        AntiLepton::Tau(x)      => 1f64,
-        AntiLepton::ElectronNeutrino(x) => 0f64,
-        AntiLepton::MuNeutrino(x)       => 0f64,
-        AntiLepton::TauNeutrino(x)      => 0f64,
+        AntiLepton::Electron(_) => 1f64,
+        AntiLepton::Muon(_)     => 1f64,
+        AntiLepton::Tau(_)      => 1f64,
+        AntiLepton::ElectronNeutrino(_) => 0f64,
+        AntiLepton::MuNeutrino(_)       => 0f64,
+        AntiLepton::TauNeutrino(_)      => 0f64,
         }
  }   
  

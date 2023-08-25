@@ -29,8 +29,8 @@ impl Meson{
  
  pub const fn rest_mass(&self)->f64{
         match self{
-          Meson::Pion(x)  => 139.6f64,
-          Meson::Kaon(x) => 135.0f64,
+          Meson::Pion(_)  => 139.6f64,
+          Meson::Kaon(_) => 135.0f64,
           } 
  }
  
@@ -40,8 +40,8 @@ impl Meson{
  
  pub const fn charge(&self)->f64{
         match self{
-          Meson::Pion(x)  => 1f64,
-          Meson::Kaon(x) => 1f64,
+          Meson::Pion(_)  => 1f64,
+          Meson::Kaon(_) => 1f64,
           } 
  }
 
@@ -61,8 +61,8 @@ impl Meson{
  /// Rest mass 
  pub const fn rest_mass(&self)->f64{
         match self{
-          AntiMeson::Pion(x)  => 139.6f64,
-          AntiMeson::Kaon(x) => 135.0f64,
+          AntiMeson::Pion(_)  => 139.6f64,
+          AntiMeson::Kaon(_) => 135.0f64,
           } 
  }
  
@@ -72,8 +72,8 @@ impl Meson{
      
  pub const fn charge(&self)->f64{
         match self{
-          AntiMeson::Pion(x)  => -1f64,
-          AntiMeson::Kaon(x) => -1f64,
+          AntiMeson::Pion(_)  => -1f64,
+          AntiMeson::Kaon(_) => -1f64,
           } 
  }
  
