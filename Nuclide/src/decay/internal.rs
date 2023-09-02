@@ -391,7 +391,6 @@ impl<const K: usize> InternalDecay for AlphaEmission<K>{
  
     match Self::decay_result(x){
         Some(dghter) => {
-    
     let a_mass = ALPHAMASS*(K as f64);
     let d_mass = dghter.am();
     let t_mass = d_mass + a_mass;
