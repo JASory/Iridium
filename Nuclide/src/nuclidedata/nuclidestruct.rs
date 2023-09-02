@@ -609,20 +609,21 @@ impl Atom for Nuclide {
         }
         
         } // end if
-        
+        //let mut x = self.clone();
         loop{
+          //println!("Alphabranch");
              if !is_mode_recorded::<T>(self){
                 return (total_energy,particlevec)
              }
       
              let mean_time = self.mean_lifetime::<T>();
              
-             if mean_time >= time || mean_time == f64::INFINITY || mean_time.is_nan(){
+             if mean_time >= time || mean_time.is_infinite() || mean_time.is_nan(){
                 return (total_energy,particlevec)
              }
              
              let (energy, p_vector) = T::decay(self);
-             
+             //println!("{}",x);
              particlevec.extend_from_slice(&p_vector[..]);
              total_energy+=energy;
              
