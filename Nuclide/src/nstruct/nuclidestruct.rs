@@ -5,7 +5,7 @@
 use crate::traits::{Atom,ChemElement};
 use crate::constant::*;
 
-use crate::nuclidedata::index::*;
+use crate::nuclidedata::index::*
 
 use crate::particle::*;
 

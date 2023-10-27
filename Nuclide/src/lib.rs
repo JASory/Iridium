@@ -23,28 +23,25 @@
 */
 #![allow(non_snake_case)]
 
-mod atom;
-mod isomer;
+mod traits;
+mod estruct;
 pub(crate) mod nuclidedata;
+pub(crate) mod nstruct;
 pub mod decay;
 mod particle;
 mod rng;
 mod mmodel;
 pub(crate) mod constant;
 
-pub use crate::atom::Atom;
-pub use crate::isomer::Isomer;
-pub use crate::nuclidedata::nuclidestruct::Nuclide;
-//pub use crate::Nuclide;
+pub use crate::traits::{ChemElement,Isotope};
+pub use crate::estruct::EnergeticNuclide;
+pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
-//pub use crate::types::*;
-//pub(crate) use crate::decay::*;
+
 
 // decay chain 
 // adjacency_matrix
 // daughter isotopes
 // parent isotopes
 // Decay types vector   
-// partial_half_life
-// partial_decay_constant
 // decay_types 

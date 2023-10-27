@@ -3,7 +3,7 @@
  use crate::nuclidedata::decay_chain::DECAY_CHAIN;
  use crate::rng::rand;
  use crate::{Nuclide,Particle};
- use crate::atom::Atom;
+ use crate::traits::ChemElement;
  use crate::constant::*;
  use crate::mmodel::mass_model;
  

@@ -70,11 +70,10 @@
     Fission is not counted
 
 */
-use crate::nuclidedata::nuclidestruct::Nuclide;
+use crate::nstruct::Nuclide;
+use crate::traits::{ChemElement};
 use crate::decay::types::*;
 use crate::decay::dhelper::{max,theoretical_mass,elementary_mass, decay_mode_idx,decay_select};
-use crate::atom::Atom;
-//use crate::nuclidedata::decay_chain::DECAY_CHAIN;
 use crate::rng::rand;
 use crate::Particle;
 use crate::constant::*;

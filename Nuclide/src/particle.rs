@@ -4,7 +4,7 @@ use Pion::AntiLepton;
 use Pion::Lepton;
 //use Pion::photon::Photon;
 
-use crate::nuclidedata::nuclidestruct::Nuclide;
+use crate::nstruct::Nuclide;
 
 /// Generalized representation of potential decay particles
 #[derive(Debug, Clone)]
