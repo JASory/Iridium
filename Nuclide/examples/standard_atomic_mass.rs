@@ -1,5 +1,5 @@
 use ::Nuclide::Nuclide;
-use ::Nuclide::Atom;
+use ::Nuclide::ChemElement;
 
 /*
    Nuclide does not have a standard atomic weight for the elements however it can be trivially computed for a sample

@@ -3,7 +3,7 @@
 */
 
 use ::Nuclide::Nuclide;
-use ::Nuclide::Atom;
+use ::Nuclide::ChemElement;
 
 struct Water {
   oxygen : Nuclide,
