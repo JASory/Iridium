@@ -23,9 +23,9 @@ pub(crate) fn mass_model(a: usize, z: usize) -> f64 {
   let mut onp :  [[[f64;9];2];2] = [[[0f64;9];2];2];
   
   let n = a-z;
-  let nuclei : [usize;2] = [n,z]; //= vec![n,z];
+  let nuclei : [usize;2] = [n,z]; 
   
-  //let n = a-z;
+  
   let a = n+z;
   let t = n.abs_diff(z);
   let r = (a as f64).cbrt();
