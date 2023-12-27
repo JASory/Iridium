@@ -18,8 +18,8 @@ pub struct Nuclide {
 
 impl std::fmt::Display for Nuclide {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let iso = self.isotope();
-        write!(f, "{}-{}",SYMBOL[iso.0 - 1], iso.1)
+        let (z, n) = self.isotope();
+        write!(f, "{}-{}", SYMBOL[z - 1], n)
     }
 }
 
@@ -29,62 +29,43 @@ impl Nuclide {
 /// Currently the input must be of the form {Symbol}-{Nucleon count}
 /// ```
 ///         use ::Nuclide::Nuclide;
-///         use ::Nuclide::Atom;
 ///          
 ///         let u235 = Nuclide::new("U-235").unwrap();
 ///         assert_eq!(u235.to_string(),"U-235");
 /// ```
     pub fn new(input: &str) -> Option<Nuclide> {
-    
-        let z = input.split('-').collect::<Vec<&str>>();
-        if z.len() != 2 {
-            return None;
-        }
+        let [symbol, nucleons_str]: [&str; 2] = input.split('-')
+            .collect::<Vec<&str>>()
+            .try_into()
+            .ok()?;
 
-        let isotope: usize = match z[1].parse::<usize>() {
-            Ok(x) => x,
-            Err(_) => usize::MAX,
-        };
+        let nucleons = nucleons_str.parse::<usize>().ok()?;
 
-        if isotope == usize::MAX {
-            return None;
-        }
-
-        let x = z[0];
-
-        match SYMBOL.iter().position(|y| y == &x) {
-            Some(x) => {
-                if isotope >= SYMBOL_INDEX[x].1 && isotope <= SYMBOL_INDEX[x].2 {
-                    Some(Nuclide {
-                        idx: SYMBOL_INDEX[x].0 + isotope - SYMBOL_INDEX[x].1,
-                    })
-                } else {
-                    None
-                }
-            }
-            None => None,
-        }
+        let z_offset = SYMBOL.iter().position(|&element_str| element_str == symbol)?;
+        let (start, a_min, a_max) = SYMBOL_INDEX[z_offset];
+        (a_min..=a_max).contains(&nucleons)
+            .then_some(Nuclide {idx: start + nucleons - a_min})
     }
     
     /// In : proton, neutron
     /// Out: Nuclide  
-    pub fn from_nucleons_unchecked(z: usize, n: usize) -> Self{
-         Nuclide{idx: SYMBOL_INDEX[z - 1].0 - (SYMBOL_INDEX[z - 1].1 - z) + n}
+    pub fn from_nucleons_unchecked(protons: usize, neutrons: usize) -> Self{
+        let (start, a_min, _) = SYMBOL_INDEX[protons - 1];
+        let a = protons + neutrons;
+        Nuclide {idx: start + a - a_min}
     }
 
     /// In: proton, neutron 
-    /// # None
     /// Returns None if the Nuclide doesn't exist
-    pub fn from_nucleons(z: usize, n: usize) -> Option<Self> {
-        if z == 0 || z > 118 {
+    pub fn from_nucleons(protons: usize, neutrons: usize) -> Option<Self> {
+        if protons == 0 {
             return None;
         }
-        let n_lo = SYMBOL_INDEX[z - 1].1 - z;
-        let n_hi = SYMBOL_INDEX[z - 1].2 - z;
-        if n >= n_lo && n <= n_hi {
-            return Some(Nuclide::from_nucleons_unchecked(z, n));
-        }
-        None
+
+        let (start, a_min, a_max) = *SYMBOL_INDEX.get(protons - 1)?;
+        let a = protons + neutrons;
+        (a_min..=a_max).contains(&a)
+            .then_some(Nuclide {idx: start + a - a_min})
     }
     
     /// Construct a nuclide from the unique index. Avoid direct use as no checks are performed to ensure that it is valid
@@ -114,12 +95,10 @@ impl Nuclide {
 
     /// Returns the atomic number and the nucleon count
     pub fn isotope(&self) -> (usize, usize) {
-        let element = self.atomic_num();
-        (
-            element as usize,
-            (self.idx - SYMBOL_INDEX[element as usize - 1].0)
-                + SYMBOL_INDEX[element as usize - 1].1,
-        )
+        let z = self.atomic_num() as usize;
+        let (start, a_min, _) = SYMBOL_INDEX[z - 1];
+        let a = self.idx - start + a_min;
+        (z, a)
     }
 
     ///Returns the element name.     
@@ -129,7 +108,8 @@ impl Nuclide {
 
     ///Returns the proton and neutron count
     pub fn proton_neutron(&self) -> (usize, usize) {
-        (self.isotope().0, self.isotope().1 - self.isotope().0)
+        let (z, a) = self.isotope();
+        (z, a - z)
     }
 
     /// Approximate neutron separation energy
@@ -239,7 +219,7 @@ impl Nuclide {
     }
     
     ///Returns the isospin and parity in the form of a i8 pair, one of which is negatively signed for - parity
-    fn spin_parity(&self) -> (i8, i8) {
+    pub fn spin_parity(&self) -> (i8, i8) {
         SPIN_PARITY[self.idx]
     }
     
