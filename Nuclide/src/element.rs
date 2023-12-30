@@ -25,7 +25,7 @@ impl std::fmt::Display for NuclideFraction {
 
 impl NuclideFraction {
     pub fn from_nucleon_fractions(protons: u8, nucleon_fractions: &[(u16, f64)]) -> Option<NuclideFraction> {
-        println!("{:?}", nucleon_fractions);
+        
         // At least one nuclide
         if nucleon_fractions.is_empty() {
             return None;
