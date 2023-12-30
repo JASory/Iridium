@@ -196,7 +196,7 @@ impl Isotope for Nuclide {
     Returns the name and isotope number of the nuclide
 
        ```
-       use ::Nuclide::{Atom,Nuclide};
+       use ::Nuclide::{Nuclide, Isotope};
        use ::Nuclide::decay::TotalDecay;
        let mut uranium = Nuclide::new("U-238").unwrap();
 

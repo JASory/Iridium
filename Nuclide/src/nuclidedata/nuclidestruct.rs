@@ -340,12 +340,16 @@ impl Atom for Nuclide {
         if self.atomic_num() > 110 {
             None
         } else if level > 0 && level < self.atomic_num() as usize + 1 {
-            Some(
-                IONIZATION_ENERGIES[((((self.atomic_num() * (self.atomic_num() + 1)) >> 1)
-                    - self.atomic_num())
-                    + level as u64
-                    - 1) as usize],
-            )
+            let index = ((((self.atomic_num() * (self.atomic_num() + 1)) >> 1)
+                - self.atomic_num())
+                + level as u64
+                - 1) as usize;
+            let energy = IONIZATION_ENERGIES[index];
+            if energy.is_nan() {
+                None
+            } else {
+                Some(energy)
+            }
         } else {
             None
         }

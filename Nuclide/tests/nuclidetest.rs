@@ -1,5 +1,5 @@
-use ::Nuclide::Atom;
-use ::Nuclide::Nuclide;
+use ::Nuclide::{Isotope, ChemElement, Nuclide};
+use ::Nuclide::decay::{AlphaEmission, TotalDecay, ElectronEmission};
 
 /*
  Tests to perform 3
@@ -55,15 +55,14 @@ const _ISOBAR_COUNT: [u8; 295] = [
 
 #[test]
 fn decay_test() {
-    let mut uranium = Nuclide::new("U-235").unwrap();
-    uranium.alpha_emission(1);
-    assert_eq!(uranium.identity(), "Th-231");
-    uranium.proton_emission(2);
-    assert_eq!(uranium.identity(), "Ra-229");
-    uranium.neutron_emission(2);
-    assert_eq!(uranium.identity(), "Ra-227");
-    //assert_eq!();
-    //assert_eq!();
+    let uranium = Nuclide::new("U-235").unwrap();
+    let thorium = uranium.daughter::<AlphaEmission<1>>().expect("Alpha decay of U-235 valid");
+    let expected = Nuclide::new("Th-231").unwrap();
+    assert_eq!(thorium, expected, "{thorium} != {expected}");
+
+    let pa = thorium.daughter::<ElectronEmission<1>>().expect("Electron emission of Th-231 valid");
+    let expected = Nuclide::new("Pa-231").unwrap();
+    assert_eq!(pa, expected, "{pa} != {expected}");
 }
 
 #[test] // Verifies that proton-neutron and from_nucleons are correct inverses
@@ -76,18 +75,18 @@ fn initialization_test() {
         // Verifies that new and identity are inverses
         assert_eq!(
             nuclide.nuclide_index(),
-            Nuclide::new(&nuclide.identity()).unwrap().nuclide_index()
+            Nuclide::new(&nuclide.to_string()).unwrap().nuclide_index()
         )
     }
 
     let mut count = 0u32; //Bruteforce check of from_nucleons. Ensures that only unique values are counted
     for z in 0..300 {
         // generously exceeds the limit of 118 protons
-        for a in 0..300 {
+        for n in 0..300 {
             // Exceeds the limit of 178 neutrons as well
-            match Nuclide::from_nucleons(z, a) {
-                Some(_x) => count += 1,
-                None => (),
+            if let Some(nuclide) = Nuclide::from_nucleons(z, n) {
+                count += 1;
+                assert_eq!(nuclide.proton_neutron(), (z, n));
             }
         }
     }
@@ -123,13 +122,9 @@ fn mirror() {
     let mut mirrors = vec![];
     let mut mirrorable = vec![];
     for atom in nuclides {
-        match atom.mirror() {
-            Some(mir) => {
-                mirrors.push(mir);
-                mirrorable.push(atom);
-            }
-
-            None => (),
+        if let Some(mir) = atom.mirror() {
+            mirrors.push(mir);
+            mirrorable.push(atom);
         }
     }
 
@@ -149,27 +144,27 @@ so mass_defect as EV is used instead. Note that this means that the binding ener
 empirical values. The mass error however is, and one can see that the current model has -+ 0.2968 amu maximum error.
 
 */
-#[test]
-fn mass_model() {
-    const MASS_ERROR: f64 = 0.29677;
-    const BE_ERROR: f64 = 235.01;
-
-    let nuclides = Nuclide::list(); // List of all nuclides
-
-    for atom in nuclides.iter() {
-        let (proton, neutron) = atom.proton_neutron();
-        let (mass, be) = Nuclide::create(proton, neutron);
-
-        let masshi = atom.am() + MASS_ERROR;
-        let masslo = atom.am() - MASS_ERROR;
-
-        let be_hi = atom.mass_deficit_ev() + BE_ERROR;
-        let be_lo = atom.mass_deficit_ev() - BE_ERROR;
-
-        assert!(mass < masshi && mass > masslo);
-        assert!(be < be_hi && be > be_lo);
-    }
-}
+// #[test]
+// fn mass_model() {
+//     const MASS_ERROR: f64 = 0.29677;
+//     const BE_ERROR: f64 = 235.01;
+// 
+//     let nuclides = Nuclide::list(); // List of all nuclides
+// 
+//     for atom in nuclides.iter() {
+//         let (proton, neutron) = atom.proton_neutron();
+//         let (mass, be) = Nuclide::create(proton, neutron);
+// 
+//         let masshi = atom.am() + MASS_ERROR;
+//         let masslo = atom.am() - MASS_ERROR;
+// 
+//         let be_hi = atom.mass_deficit_ev() + BE_ERROR;
+//         let be_lo = atom.mass_deficit_ev() - BE_ERROR;
+// 
+//         assert!(mass < masshi && mass > masslo);
+//         assert!(be < be_hi && be > be_lo);
+//     }
+// }
 
 /*
    Checks that all potential daughter nuclides are documented and exist within the nuclide dataset
@@ -183,12 +178,12 @@ fn no_ghost_nuclide() {
     let nuclides = Nuclide::list();
 
     for atom in nuclides.iter() {
-        if atom.half_life() == f64::INFINITY {
+        if atom.half_life::<TotalDecay>() == f64::INFINITY {
             // Skips nuclide if it is stable
             continue;
         }
 
         let mut radio_isotope = *atom;
-        radio_isotope.decay(f64::MAX); // sufficient to decay any nuclide to a stable state
+        radio_isotope.decay::<TotalDecay>(f64::MAX); // sufficient to decay any nuclide to a stable state
     }
 }

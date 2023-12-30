@@ -37,6 +37,7 @@ pub use crate::traits::{ChemElement,Isotope};
 pub use crate::estruct::EnergeticNuclide;
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
+pub mod element;
 
 
 // decay chain 
