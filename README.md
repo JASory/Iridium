@@ -3,18 +3,18 @@ Atomic Physics Library
 
 ## Nuclide 
   This is a nuclide database meant to address two issues. The lack of any nuclide databases in Rust, and the generally limited
- and outdated information other databases have (frequently copying data from Wikipedia or T. Gray's periodic table, which are outdated in there own right). The current version of this library has data on 3584 nuclides in there ground-base states. The primary sources are NUBASE2020[8], the ENDSF[9], and various Nuclear Data Sheets.
+ and outdated information other databases have (frequently copying data from Wikipedia or T. Gray's periodic table, which are outdated in there own right). The current version of this library has data on 3584 nuclides in their ground-base states. The primary sources are NUBASE2020[8], the ENDSF[9], and various Nuclear Data Sheets.
   In cases of ambiguity, estimates are made by the author based on trends from the neighboring nuclides. 
   
-                                                                               -Sory, J.A
+                                                       -Sory, J.A
 #### Available Data
-- Electronegative Values predicted for the thermochemical electronega-
+- Electronegative Values predicted for the thermochemical electronega
 tivity, currently the best predictor of experimental values[1].
 - Pauling  Electronegativity using the Pauling scale, mostly kept for completeness as
 the Pauling scale performs poorly in application [3].
 - Allen Electronegativity using the Allen scale[2]
 - Electron Affinities of the elements, in kilojoules/mol
-- Ionization Energies of all known electron configurations[]
+- Ionization Energies of all known electron configurations
 - Covalent Radii The covalent radii calculated from single[5], double[6] and triple[7] bonds
 - Van der Waal radii approximated in crystalline structures and isolated atoms. 
 Unlike most libraries and databases which use Bondi’s approximations to the van der Waal
@@ -25,29 +25,30 @@ radius, Batsanov’s approximations are used here [4].
 #### Features                                        
 In addition to providing the previous information this library has some other features. 
 - Simple modeling of decay including decay particle energies
-- Prediction of mass and binding energies of theorectical nuclides using Bethe-Weiszacker Liquid Drop model
-See the periodic table repository for a simple look-up gui implementation. 
+- Prediction of mass and binding energies of theorectical nuclides using the Duflo-Zuker 10-parameter mass model
+- Natural abundance fractions 
 
 #### Usage 
    ```rust
 
- use Nuclide::Nuclide;
+ use ::Nuclide::{Nuclide,ChemElement,Isotope,::decay::TotalDecay};
  
    // Create mutable U-235 nuclide, mutable to permit decay. 
    
   let mut u235 = Nuclide::new("U-235").unwrap();
   
+  // Or alternately 
+  let mut u235 = "U-235".parse::<Nuclide>().unwrap();
+  
    // Approximation ionization energy of U-235 +52 in kilojoules per mole 
-   
-   //(SI units are produced by default, however non-SI units are also frequently supported, read the documentation)
    
    assert_eq!(u235.ionization_energies(52).unwrap(),283474.03313085996);
    
    // Model the decay over 5x10^20 seconds, total energy and particles are released 
    
-   let (decay_energy, decay_particles) = u235.decay(5E+20);
+   let (decay_energy, decay_particles) = u235.decay::<TotalDecay>(5E+20);
    
-   assert_eq!(u235.identity(), "Pb-206")
+   assert_eq!(u235.to_string(), "Pb-206")
  ```
 
 #### References
