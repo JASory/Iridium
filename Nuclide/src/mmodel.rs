@@ -1,6 +1,8 @@
 /*
     Mass model computing the binding energy
     
+    Translated from Duflo-Zuker's 10-parameter Fortran 90 code
+    
     In: total nucleons, number of protons
     Out: Binding energy in MeV
 */

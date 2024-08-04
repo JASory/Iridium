@@ -67,6 +67,10 @@ impl Isotope for Nuclide {
     fn decay_probability<T: DecayMode>(&self, time: f64) -> f64{
            1.0 - (-self.decay_constant::<T>() * time).exp()
     }
+    
+    fn daughter_theoretical<T: DecayMode>(&self) -> Option<Self>{
+    	T::decay_result(self)
+    }
 
     //lowest probability is 1/u64::MAX
     ///Returns true if the nuclide would have decayed in the time given. The nuclide remains unchanged
@@ -196,9 +200,8 @@ impl Isotope for Nuclide {
     Returns the name and isotope number of the nuclide
 
        ```
-       use ::Nuclide::{Nuclide, Isotope};
-       use ::Nuclide::decay::TotalDecay;
-       let mut uranium = Nuclide::new("U-238").unwrap();
+       use ::Nuclide::{Nuclide, Isotope,::decay::TotalDecay};
+       let mut uranium = "U-238".parse::<Nuclide>().unwrap();
 
       // total particle energy of the nuclide and vector of decay particles
        let (particle_energy,particle_vector) = uranium.decay::<TotalDecay>(5E+20);

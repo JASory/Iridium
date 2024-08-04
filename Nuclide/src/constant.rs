@@ -12,7 +12,7 @@ pub(crate) const NUCLIDE_COUNT : usize = 3585;
 #[allow(non_upper_case_globals)]
 pub(crate) const DALTON_MeV: f64 = 931.49410242;
 
-pub(crate) const DALTON_KG : f64 = 1.6605390666E-27;
+pub(crate) const _DALTON_KG : f64 = 1.6605390666E-27;
 
 #[allow(non_upper_case_globals)]
 pub(crate) const MeV_DALTON: f64 = 0.0010735441023212314;

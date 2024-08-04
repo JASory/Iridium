@@ -1,6 +1,6 @@
 /*!
 
-  Nuclide is a simple modeling and data library for nuclear isotopes (and eventually isomers and/or ions). It is meant to be a midpoint between
+  Nuclide is a simple modeling and data library for nuclear isotopes. It is meant to be a midpoint between
   basic periodic table libraries and advanced research software like GEANT4.
 
   Notable capabilities of this library are listed below.
@@ -24,7 +24,6 @@
 #![allow(non_snake_case)]
 
 mod traits;
-mod estruct;
 pub(crate) mod nuclidedata;
 pub(crate) mod nstruct;
 pub mod decay;
@@ -32,17 +31,9 @@ mod particle;
 mod rng;
 mod mmodel;
 pub(crate) mod constant;
+pub(crate) mod element;
 
 pub use crate::traits::{ChemElement,Isotope};
-pub use crate::estruct::EnergeticNuclide;
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
-pub mod element;
-
-
-// decay chain 
-// adjacency_matrix
-// daughter isotopes
-// parent isotopes
-// Decay types vector   
-// decay_types 
+pub use crate::element::{Element,NuclideFraction};

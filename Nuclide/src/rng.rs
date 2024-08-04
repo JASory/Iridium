@@ -2,6 +2,10 @@
    PRNG for decay chain 
 */
 
+
+// Possible improvements
+// The higher bits of x are going to be identical in most cases so some copying/XOR-ing of 
+// lower bits into higher positions could improve entropy
 #[inline(always)]
 fn default_xor() -> u64{
    let mut x = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos() as u64;

@@ -1,9 +1,7 @@
 use crate::nuclidedata::index::{NAME,SYMBOL,SYMBOL_INDEX};
 use crate::mmodel::mass_model;
 use crate::constant::*;
-use crate::decay::DecayMode;
-use crate::decay::decayimpl::decayindex;
-use crate::traits::{ChemElement,Isotope};
+use crate::traits::{ChemElement};
 use crate::nuclidedata::spinparity::SPIN_PARITY;
 
 
@@ -22,6 +20,19 @@ impl std::fmt::Display for Nuclide {
         write!(f, "{}-{}", SYMBOL[z - 1], n)
     }
 }
+
+impl std::str::FromStr for Nuclide{
+
+     type Err = &'static str;
+     
+  fn from_str(input: &str) -> Result<Self,Self::Err>{
+      match Nuclide::new(input){
+         Some(x) => Ok(x), 
+         None => Err("Parsing error"),
+      }
+     } 
+  
+  }
 
 impl Nuclide {
 
@@ -78,7 +89,7 @@ impl Nuclide {
         self.idx = idx;
     }
     
-    /// Returns the approximate mass and binding energy of a nuclide, theorectical or real, using the Bethe-Weizacker liquid-drop approximation.
+    /// Returns the approximate mass and binding energy of a nuclide, theorectical or real, using the DZ-10 mass model.
     pub fn create(z: usize, n: usize) -> (f64, f64) {
         let b_e = mass_model(z + n, z);
         (
@@ -151,7 +162,7 @@ impl Nuclide {
 
     check that n+(z-i) is valid for the point z-(z-i)
       */
-    /// Produces a vector of all nuclides sorted by atomic number, e.g all hydrogen isotopes, all helium isotopes, ...
+    /// Produces an iterator of all nuclides sorted by atomic number, e.g all hydrogen isotopes, all helium isotopes, ...
     pub fn list() -> Vec<Self> {
         (0..NUCLIDE_COUNT)
             .map(Nuclide::assign)
@@ -163,7 +174,7 @@ impl Nuclide {
         let table = Nuclide::list();
         let mut isobars = vec![];
         let a = self.proton_neutron().0 + self.proton_neutron().1;
-        for i in table {
+        for i in table{
             let (z, n) = i.proton_neutron();
             if (z + n) == a {
                 isobars.push(i)
@@ -186,38 +197,7 @@ impl Nuclide {
         }
         n_vector
     }
-    
-    /// Probability of the provided Decay mode being taken
-    /// # NAN
-    /// If Decay Mode is not observed return NAN
-    pub fn branching_ratio<T: DecayMode>(&self) -> f64{
-      let idx = self.nuclide_index() * 6 + 5; 
-      match decayindex::<T>(idx){
-        Some(x) => x as f64/FLOAT_64,
-        None => f64::NAN,
-      }
-    }
-    
-    
-    /// Returns the daughter nuclide, regardless of whether it has been observed
-    /// # None
-    /// If the decay result is not a known nuclide, returns None
-    pub fn daughter_theoretical<T: DecayMode>(&self) -> Option<Self>{
-    	T::decay_result(self)
-    }
-    
-    /*
-    /// List of Daughter isotopes
-    pub fn daughter_list(&self) -> Vec<Self>{
-        let decay_vector = DECAY_CHAIN[self.nuclide_index() * 6 + 5].to_be_bytes();
-        decay_vector[0] == 
-        
-    }
-   */
-    pub fn decay_probability<T: DecayMode>(&self, time: f64) -> f64{
-           1.0 - (-self.decay_constant::<T>() * time).exp()
-    }
-    
+
     ///Returns the isospin and parity in the form of a i8 pair, one of which is negatively signed for - parity
     pub fn spin_parity(&self) -> (i8, i8) {
         SPIN_PARITY[self.idx]

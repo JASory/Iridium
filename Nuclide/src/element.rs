@@ -24,6 +24,7 @@ impl std::fmt::Display for NuclideFraction {
 }
 
 impl NuclideFraction {
+
     pub fn from_nucleon_fractions(protons: u8, nucleon_fractions: &[(u16, f64)]) -> Option<NuclideFraction> {
         
         // At least one nuclide
@@ -32,10 +33,10 @@ impl NuclideFraction {
         }
 
         // Ensure sum of fractions is very close to 1.0
-        let fraction_sum: f64 = nucleon_fractions.iter().map(|tup| tup.1).sum();
-        if dbg!((fraction_sum - 1.0).abs()) > 1e-2 {
-            return None;
-        }
+        //let fraction_sum: f64 = nucleon_fractions.iter().map(|tup| tup.1).sum();
+        //if dbg!((fraction_sum - 1.0).abs()) > 1e-2 {
+        //    return None;
+        //}
 
         nucleon_fractions.iter()
             .map(|&(nucleons, abundance)| {
@@ -129,6 +130,15 @@ impl ChemElement for NuclideFraction {
     }
 }
 
+/// Enum for general chemical  element properties
+///
+/// ```
+///   use ::Nuclide::{Element,ChemElement};
+///    let lithium = Element::Li;
+///    let am = lithium.am();
+///    let ionization_lvl2 = lithium.ionization_energies(2).unwrap();
+/// ```
+///
 #[rustfmt::skip]
 #[repr(u8)]
 #[derive(Copy, Clone, Debug)]
