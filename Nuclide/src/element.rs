@@ -1,7 +1,8 @@
 
 use crate::Nuclide;
+use crate::nuclidedata::element_translation::{NAME_PL, NAME_DE};
 use crate::traits::ChemElement;
-use crate::nuclidedata::index::SYMBOL;
+use crate::nuclidedata::index::{NAME, SYMBOL};
 use crate::nuclidedata::elemental::*;
 use crate::nuclidedata::ionization::IONIZATION_ENERGIES;
 
@@ -536,6 +537,22 @@ impl Element {
 
     pub const fn symbol(&self) -> &'static str {
         SYMBOL[*self as usize - 1]
+    }
+
+    /// Returns the element name.
+    pub fn element_name(&self) -> String {
+        NAME[self.atomic_num() as usize - 1].to_string()
+    }
+
+    /// Returns the element name in a given language. Be default, or if the language code is not
+    /// recognized (no data exists for such a translation), the original English name is returned.
+    pub fn element_name_by_lang(&self, lang: &str) -> String {
+        let el_idx = self.atomic_num() as usize - 1;
+        match lang {
+            "pl" => NAME_PL[el_idx].to_string(),
+            "de" => NAME_DE[el_idx].to_string(),
+            _ => NAME[el_idx].to_string()
+        }
     }
 
     /// Fraction as measured from samples on Earth. For non-abundant elements,

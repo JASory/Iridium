@@ -5,4 +5,4 @@ pub(crate) mod half_life;
 pub(crate) mod index;
 pub(crate) mod ionization;
 pub(crate) mod spinparity;
-
+pub(crate) mod element_translation;
