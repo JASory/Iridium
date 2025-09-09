@@ -24,6 +24,7 @@
 #![allow(non_snake_case)]
 
 mod traits;
+mod periodicity;
 pub(crate) mod nuclidedata;
 pub(crate) mod nstruct;
 pub mod decay;
@@ -34,6 +35,7 @@ pub(crate) mod constant;
 pub(crate) mod element;
 
 pub use crate::traits::{ChemElement,Isotope};
+pub use crate::periodicity::{Periodicity, ElectronConfig, Group, Period};
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
 pub use crate::element::{Element,NuclideFraction};
