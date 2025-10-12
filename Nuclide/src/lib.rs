@@ -33,8 +33,9 @@ mod rng;
 mod mmodel;
 pub(crate) mod constant;
 pub(crate) mod element;
+pub mod quantum_electron;
 
-pub use crate::traits::{ChemElement,Isotope};
+pub use crate::traits::{ChemElement, Isotope};
 pub use crate::periodicity::{Periodicity, ElectronConfig, Group, Period};
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
