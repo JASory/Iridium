@@ -1,10 +1,11 @@
-
+use std::str::FromStr;
 use crate::Nuclide;
+use crate::nuclidedata::element_translation::{NAME_PL, NAME_DE};
 use crate::traits::ChemElement;
-use crate::nuclidedata::index::SYMBOL;
+use crate::nuclidedata::index::{NAME, SYMBOL};
 use crate::nuclidedata::elemental::*;
 use crate::nuclidedata::ionization::IONIZATION_ENERGIES;
-
+use strum_macros::EnumString;
 
 // TODO
 // - calculate element mass const for each element
@@ -128,6 +129,20 @@ impl ChemElement for NuclideFraction {
     fn vdr_isolated(&self) -> f64 {
         self.first().vdr_isolated()
     }
+}
+
+/// Enum for language of choice, e.g. for elements' names.
+#[derive(EnumString)]
+pub enum Lang {
+    #[strum(serialize = "Eng", serialize = "eng", serialize = "ENG", serialize = "en", serialize = "EN")]
+    /// English - default. In `from_str` can be used any of the following: `Eng|eng|ENG|en|EN`
+    Eng,
+    #[strum(serialize = "De", serialize = "de", serialize = "DE")]
+    /// German. In `from_str` can be used any of the following: `De|de|DE`
+    De,
+    #[strum(serialize = "Pol", serialize = "pol", serialize = "POL", serialize = "pl", serialize = "PL")]
+    /// Polish. In `from_str` can be used any of the following: `Pol|pol|POL|pl|PL`
+    Pol,
 }
 
 /// Enum for general chemical  element properties
@@ -536,6 +551,30 @@ impl Element {
 
     pub const fn symbol(&self) -> &'static str {
         SYMBOL[*self as usize - 1]
+    }
+
+    /// Returns the element name.
+    pub fn element_name(&self) -> String {
+        NAME[self.atomic_num() as usize - 1].to_string()
+    }
+
+    /// Returns the element name in a given language. If the language code is not recognized
+    /// (no data exists for such a translation), the original English name is returned.
+    pub fn element_name_by_lang(&self, lang: Lang) -> String {
+        let el_idx = self.atomic_num() as usize - 1;
+        match lang {
+            Lang::De => NAME_DE[el_idx].to_string(),
+            Lang::Pol => NAME_PL[el_idx].to_string(),
+            _ => NAME[el_idx].to_string()
+        }
+    }
+
+    /// Uses [`element_name_by_lang`](#method.element_name_by_lang) with prior conversion of the provided
+    /// string representation of the language into appropriate enum value. In case of unrecognized
+    /// (erroneous or not supported) language representation, [`Lang::En`](Lang) (English) is used.
+    /// Should prove useful for Nuclide's "clients" using only string representations of languages.
+    pub fn element_name_by_lang_str(&self, lang: &str) -> String {
+        self.element_name_by_lang(Lang::from_str(lang).unwrap_or(Lang::Eng))
     }
 
     /// Fraction as measured from samples on Earth. For non-abundant elements,

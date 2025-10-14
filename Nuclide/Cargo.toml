@@ -14,3 +14,5 @@ readme = "README.md"
 
 [dependencies]
 Pion = "0.0.2"
+strum = { version = "0.27.2" }
+strum_macros = "0.27.2"
