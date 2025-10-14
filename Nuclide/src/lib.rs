@@ -38,4 +38,4 @@ pub use crate::traits::{ChemElement,Isotope};
 pub use crate::periodicity::{Periodicity, ElectronConfig, Group, Period};
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
-pub use crate::element::{Element,NuclideFraction};
+pub use crate::element::{Element,NuclideFraction,Lang};
