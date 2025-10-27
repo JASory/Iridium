@@ -105,7 +105,8 @@
 		46 => ElectronProton::<2>::decay(input),  
 		47 => ElectronProton::<3>::decay(input),  	
 		48 => ProtonEmission::<3>::decay(input),
-		49 => ClusterDecay::<135>::decay(input), // Ne-26			  
+		49 => ClusterDecay::<135>::decay(input), // Ne-26	
+		50 => ElectronNeutron::<4>::decay(input), // B- 4n
                 _ => (0f64, Vec::<Particle>::new()), // if no decay then return empty data
             } // end match
  }   

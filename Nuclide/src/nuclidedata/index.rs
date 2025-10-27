@@ -1,3 +1,4 @@
+/*
 #[rustfmt::skip]
 pub(crate) const NAME: [&str; 118] = [
 
@@ -32,7 +33,7 @@ pub(crate) const NAME: [&str; 118] = [
        "Nihonium"     , "Flerovium"    , "Moscovium"    , "Livermorium"   , 
        "Tennesine"    , "Oganesson"    ,
 ];
-
+*/
 #[rustfmt::skip]
 pub const SYMBOL: [&str; 118] = [
     

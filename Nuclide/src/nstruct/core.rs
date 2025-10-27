@@ -1,8 +1,7 @@
-use crate::nuclidedata::index::{NAME,SYMBOL,SYMBOL_INDEX};
+use crate::nuclidedata::{index::{SYMBOL,SYMBOL_INDEX},lang::*, spinparity::SPIN_PARITY};
 use crate::mmodel::mass_model;
 use crate::constant::*;
 use crate::traits::{ChemElement};
-use crate::nuclidedata::spinparity::SPIN_PARITY;
 
 
 
@@ -111,10 +110,18 @@ impl Nuclide {
         let a = self.idx - start + a_min;
         (z, a)
     }
-
+    
     ///Returns the element name.     
-    pub fn element_name(&self) -> String {
-        NAME[self.atomic_num() as usize - 1].to_string()
+    pub fn element_name(&self, lang: Lang) -> String {
+        let idx = self.atomic_num().wrapping_sub(1) as usize;
+        match lang{
+          Lang::En => NAME_EN[idx].to_string(),
+          Lang::Es => NAME_ES[idx].to_string(),
+          Lang::Pl => NAME_PL[idx].to_string(),
+          Lang::De => NAME_DE[idx].to_string(),
+          Lang::Fr => NAME_FR[idx].to_string(),
+          Lang::Ru => NAME_RU[idx].to_string(),
+        }
     }
 
     ///Returns the proton and neutron count

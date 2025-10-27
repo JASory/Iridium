@@ -1,5 +1,4 @@
-use crate::decay::internal::InternalDecay;
-use crate::decay::types::*;
+use crate::decay::{types::*,internal::InternalDecay};
 use crate::nuclidedata::decay_chain::DECAY_CHAIN;
 
 // Modes of decay

@@ -1,9 +1,12 @@
 
 use crate::Nuclide;
 use crate::traits::ChemElement;
-use crate::nuclidedata::index::SYMBOL;
-use crate::nuclidedata::elemental::*;
-use crate::nuclidedata::ionization::IONIZATION_ENERGIES;
+use crate::nuclidedata::{
+      elemental::*,
+      lang::*,
+      index::SYMBOL,
+      ionization::IONIZATION_ENERGIES
+      };
 
 
 // TODO
@@ -18,7 +21,7 @@ pub struct NuclideFraction {
 
 impl std::fmt::Display for NuclideFraction {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let symbol = self.first().element_name();
+        let symbol = self.first().element_name(Lang::En);
         write!(f, "{}-[{:?}]", symbol, self.fractions)
     }
 }
@@ -141,7 +144,7 @@ impl ChemElement for NuclideFraction {
 ///
 #[rustfmt::skip]
 #[repr(u8)]
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug,PartialEq)]
 pub enum Element {
     H=1, He , Li , Be , B  , C  , N  , O  , F ,
     Ne , Na , Mg , Al , Si , P  , S  , Cl , Ar,
@@ -526,6 +529,10 @@ impl Element {
         *self as u8
     }
 
+    const fn from_protons_unchecked(protons: u8) -> Element{
+          unsafe {std::mem::transmute(protons)}
+    }
+
     pub const fn from_protons(protons: u8) -> Element {
         if protons == 0 || protons > Element::Og.protons() {
             panic!("Invalid number of protons for an element");
@@ -548,9 +555,36 @@ impl Element {
     pub fn iter() -> impl Iterator<Item = Element> {
         (1..=Element::Og.protons()).map(Element::from_protons)
     }
+    
+    pub fn name(&self, lang: Lang) -> String{
+        let idx = self.protons().wrapping_sub(1) as usize;
+        match lang{
+          Lang::En => NAME_EN[idx].to_string(),
+          Lang::Es => NAME_ES[idx].to_string(),
+          Lang::Pl => NAME_PL[idx].to_string(),
+          Lang::De => NAME_DE[idx].to_string(),
+          Lang::Fr => NAME_FR[idx].to_string(),
+          Lang::Ru => NAME_RU[idx].to_string(),
+        }
+    }
+    
+    pub fn from_str_lang(x: &str, lang: Lang) -> Result<Self,&str>{
+        let input = x.to_lowercase();
+
+        // FIXME Translate the error message
+        match lang{
+          Lang::En => NAME_EN.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+          Lang::Es => NAME_ES.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+          Lang::Pl => NAME_PL.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+          Lang::De => NAME_DE.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+          Lang::Fr => NAME_FR.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+          Lang::Ru => NAME_RU.iter().position(|el| el.to_lowercase()==input).map(|p| Self::from_protons_unchecked(p as u8+1)).ok_or("Check spelling"),
+        }
+    }
 }
 
 impl ChemElement for Element {
+
     fn atomic_num(&self) -> u64 {
         *self as u64
     }
@@ -630,3 +664,23 @@ impl From<Element> for NuclideFraction {
         ).expect("Valid abundance table for these elements")
     }
 }
+
+
+
+
+impl std::str::FromStr for Element{
+  
+    type Err = &'static str;
+ 
+   fn from_str(input: &str) -> Result<Self,Self::Err>{
+      
+      for i in [Lang::En,Lang::Es,Lang::Pl,Lang::De,Lang::Fr,Lang::Ru]{
+         match Self::from_str_lang(input,i){
+           Ok(x) => return Ok(x),
+           Err(_) => (),
+         }   
+      }
+      return Err("Check spelling or language support")
+   }
+}
+

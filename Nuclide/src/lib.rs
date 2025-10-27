@@ -10,7 +10,8 @@
   - Approximation of the mass and binding energy of theorectical nuclides
   - Elemental data including : ionization levels, various atomic radii and electronegativity measures
   - Hardcoded data. Unlike more advanced libraries, all data is hardcoded or computed resulting in a condensed standalone library. It is believed by the author to be the largest standalone nuclide library in any language
-
+  - Some multi-lingual support. Elements can be identified/named by their name in English,Spanish,French,Russian,German,and Polish
+  
   Some features that are absent by design
 
   - Data on macroscopic properties, like melting point or abundance, are beyond the scope of this library which intends to model individual atoms.
@@ -37,3 +38,4 @@ pub use crate::traits::{ChemElement,Isotope};
 pub use crate::nstruct::Nuclide;
 pub use crate::particle::Particle;
 pub use crate::element::{Element,NuclideFraction};
+pub use crate::nuclidedata::lang::Lang;

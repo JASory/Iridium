@@ -729,6 +729,9 @@ impl<const K: usize> InternalDecay for ElectronNeutron<K>{
       if K == 3{
        return 15
       }
+      if K == 4{
+       return 49
+      }
       u8::MAX
   }
   
@@ -1439,7 +1442,7 @@ impl<const K: usize> InternalDecay for ClusterDecay<K>{
      129 => 27, // Ne-20
      131 => 37, // Ne-22
      133 => 28, // Ne-24
-     135 => 49, // Ne-26
+     135 => 39, // Ne-26
      176 => 32, // Mg-28
      178 => 38, // Mg-30
      115 => 33, // F-23
@@ -1476,7 +1479,10 @@ impl<const K: usize> InternalDecay for ClusterDecay<K>{
      }     
 }
 
+// Add magnesium pair 28Mg+30Mg
+// Add Ne-24+ Ne-26
 impl<const D: usize, const S: usize> InternalDecay for DoubleCluster<D,S>{
+
    fn decay(x : &mut Nuclide) -> (f64,Vec<Particle>){
    
      let d_nuclide = Nuclide::assign(D);
@@ -1577,7 +1583,7 @@ impl InternalDecay for TotalDecay{
    }
    
    
-   // FIXME  
+   // FIXME Approximate the q_value by each valid decay mode with branching ratio 
   fn q_value(_x: &Nuclide) -> f64{
       f64::NAN
      }   
